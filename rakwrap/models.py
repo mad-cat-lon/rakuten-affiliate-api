@@ -54,14 +54,25 @@ class Advertiser:
         self,
         id: int,
         name: str,
+        network: int,
         url: str = None,
-        description: str = None
+        description: str = None,
+        profiles: Dict = None,
+        policies: Dict = None,
+        features: Dict = None,
+        contact: Dict = None,
+        network_status: str = None
     ):
         self.id = id
         self.name = name
         self.url = url
         self.description = description
-
+        self.profiles = profiles
+        self.policies = policies
+        self.features = features
+        self.contact = contact
+        self.network_status = network_status
+        self.network = network
 class Event:
     def __init__(
         self,

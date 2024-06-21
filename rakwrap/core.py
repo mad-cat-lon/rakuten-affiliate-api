@@ -45,7 +45,7 @@ class Rakwrap:
         events = [Event(**event) for event in result.data]
         return events
     
-    def search_advertiser(self, advertiser_name: str) -> List[Advertiser]:
+    def search_advertisers_v1(self, advertiser_name: str) -> List[Advertiser]:
         """
         Find a list of all advertisers and advertiser MIDs given a search string
         https://developers.rakutenadvertising.com/documentation/en-CA/affiliate_apis#/Events/get_events_1_0_transactions
@@ -62,7 +62,34 @@ class Rakwrap:
         result = [{"id": res["mid"], "name": res["merchantname"]} for res in result]
         advertisers = [Advertiser(**advertiser) for advertiser in result]
         return advertisers
-    
+
+    def search_advertisers_v2(
+        self,
+        page: int = 0,
+        limit: int = 10,
+        ships_to: str = "US",
+        deep_links: bool = True,
+        network: int = 1
+    ) -> List[Advertiser]:
+        """
+        Updated version of advertiser searchht API that
+        tps://developers.rakutenadvertising.com/documentation/en-CA/affiliate_apis#/Advertisers/get_v2_advertisers
+        """
+        endpoint = "/v2/advertisers"
+        params = {
+            "page": page,
+            "limit": limit,
+            "ships_to": ships_to,
+            "deep_links": deep_links,
+            "network": network
+        }
+        result = self.adapter.get(
+            endpoint=endpoint,
+            params=params
+        ).data["advertisers"]
+        advertisers = [Advertiser(**advertiser) for advertiser in result]
+        return advertisers
+
     def search_products(
         self,
         keyword: str = None,
