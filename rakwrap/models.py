@@ -8,6 +8,18 @@ class Result:
         self.message = str(message)
         self.data = data if data else []
 
+class Advertiser:
+    def __init__(
+        self,
+        id: int,
+        name: str,
+        url: str = None,
+        description: str = None
+    ):
+        self.id = id
+        self.name = name
+        self.url = url
+        self.description = description
 
 class Event:
     def __init__(

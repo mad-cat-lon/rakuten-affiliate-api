@@ -1,0 +1,2 @@
+xmltodict==0.12.0
+xmltojson==2.0.2

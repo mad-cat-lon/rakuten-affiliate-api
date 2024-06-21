@@ -2,6 +2,9 @@ import requests
 from typing import Dict
 import base64
 from rakwrap.models import Result
+import xmltojson
+from io import StringIO
+import json
 
 class RestAdapter:
     def __init__(self, host: str, client_id: str, client_secret: str, account_id: int):
@@ -44,7 +47,15 @@ class RestAdapter:
             params=params,
             data=data
         )
-        response_data = response.json()
+        # Some APIs return XML whereas others return JSON
+        # Quick check to see what we're dealing with here
+        # TODO: Make this more robust or tag individual APIs with their datatype
+        text = response.text.strip()
+        if text.startswith("<") and not text.startswith("{"):
+            mem_file = StringIO(text)
+            response_data = json.loads(xmltojson.parse(mem_file.read()))
+        else:
+            response_data = response.json()
         if response.status_code >= 200 and response.status_code <= 299:
             return Result(response.status_code, message=response.reason, data=response_data)
         raise Exception(response_data)

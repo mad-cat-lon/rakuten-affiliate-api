@@ -1,5 +1,5 @@
 from rakwrap.rest_adapter import RestAdapter
-from rakwrap.models import Result, Event
+from rakwrap.models import Event, Advertiser
 import datetime
 from typing import List
 
@@ -32,6 +32,7 @@ class Rakwrap:
     ) -> List[Event]:
         """
         Retrieves transaction confirmations completed on a partner advertiser's website
+        https://developers.rakutenadvertising.com/documentation/en-CA/affiliate_apis#/Events/get_events_1_0_transactions
         """
         params = {
             "process_date_start": process_date_start.strftime("%Y-%m-%d %H:%M:%S"),
@@ -39,8 +40,25 @@ class Rakwrap:
             "transaction_date_start": transaction_date_start.strftime("%Y-%m-%d %H:%M:%S"),
             "transaction_date_end": transaction_date_end.strftime("%Y-%m-%d %H:%M:%S")
         }
-        print(params)
         endpoint = "/events/1.0/transactions"
         result = self.adapter.get(endpoint=endpoint, params=params)
         events = [Event(**event) for event in result.data]
         return events
+    
+    def search_advertiser(self, advertiser_name: str):
+        """
+        Find a list of all advertisers and advertiser MIDs given a search string
+        https://developers.rakutenadvertising.com/documentation/en-CA/affiliate_apis#/Events/get_events_1_0_transactions
+        """
+        params = {
+            "merchantname": advertiser_name
+        }
+        endpoint = "/advertisersearch/1.0"
+        result = self.adapter.get(
+            endpoint=endpoint,
+            params=params
+        ).data["result"]["midlist"]["merchant"]
+        # Change "mid" to "id" and "merchantname" to "name"
+        result = [{"id": res["mid"], "name": res["merchantname"]} for res in result]
+        advertisers = [Advertiser(**advertiser) for advertiser in result]
+        return advertisers
