@@ -23,3 +23,9 @@ res = rak.get_events(process_date_start, process_date_end, transaction_date_star
 for event in res:
     print(event)
 ```
+
+## Implemented endpoints
+- `​/advertisersearch​/1.0`
+- `​/events​/1.0​/transactions`
+- `/productsearch/1.0`
+- `​/v2​/advertisers`
