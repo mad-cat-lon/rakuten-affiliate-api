@@ -8,6 +8,47 @@ class Result:
         self.message = str(message)
         self.data = data if data else []
 
+class Product:
+    def __init__(
+        self,
+        mid: str,
+        merchantname: str,
+        linkid: str,
+        createdon: str,
+        sku: str,
+        productname: str,
+        category: Dict,
+        price: Dict,
+        saleprice: Dict,
+        upccode: str,
+        description: Dict,
+        keywords: str,
+        linkurl: str,
+        imageurl: str
+    ):
+        # Make the fields consistent
+        self.advertiser_id = mid
+        self.advertiser_name = merchantname
+        self.link_id = linkid
+        self.created_on = datetime.datetime.strptime(createdon, "%Y-%m-%dT%H:%M:%S.%fZ")
+        self.sku = sku
+        self.name = productname
+        self.category = category
+        self.price = price
+        self.sale_price = saleprice
+        self.upccode = upccode
+        self.description = description
+        self.keywords = keywords
+        self.link_url = linkurl
+        self.image_url = imageurl
+
+        # Fix the price fields
+    def __str__(self) -> str:
+        as_dict = self.__dict__
+        # Convert datetimes
+        as_dict["created_on"] = self.created_on.strftime("%m/%d/%Y, %H:%M:%S")
+        return json.dumps(as_dict, indent=2)
+
 class Advertiser:
     def __init__(
         self,

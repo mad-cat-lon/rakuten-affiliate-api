@@ -1,5 +1,5 @@
 from rakwrap.rest_adapter import RestAdapter
-from rakwrap.models import Event, Advertiser
+from rakwrap.models import Event, Advertiser, Product
 import datetime
 from typing import List
 
@@ -45,7 +45,7 @@ class Rakwrap:
         events = [Event(**event) for event in result.data]
         return events
     
-    def search_advertiser(self, advertiser_name: str):
+    def search_advertiser(self, advertiser_name: str) -> List[Advertiser]:
         """
         Find a list of all advertisers and advertiser MIDs given a search string
         https://developers.rakutenadvertising.com/documentation/en-CA/affiliate_apis#/Events/get_events_1_0_transactions
@@ -62,3 +62,39 @@ class Rakwrap:
         result = [{"id": res["mid"], "name": res["merchantname"]} for res in result]
         advertisers = [Advertiser(**advertiser) for advertiser in result]
         return advertisers
+    
+    def search_products(
+        self,
+        keyword: str = None,
+        exact: str = None,
+        one: str = None,
+        cat: str = None,
+        language: str = "en_US",
+        max: int = 100,
+        page_number: int = 1,
+        advertiser_id: int = None,
+        sort: str = None,
+        sort_type: str = None
+    ):
+        """
+        https://developers.rakutenadvertising.com/documentation/en-CA/affiliate_apis#/Events/get_events_1_0_transactions
+        """
+        endpoint = "/productsearch/1.0"
+        params = {
+            "keyword": keyword,
+            "exact": exact,
+            "one": one,
+            "cat": cat,
+            "language": language,
+            "max": max,
+            "pagenumber": page_number,
+            "mid": advertiser_id,
+            "sort": sort,
+            "sorttype": sort_type
+
+        }
+        result = self.adapter.get(
+            endpoint=endpoint,
+            params=params
+        ).data["result"]["item"]
+        return [Product(**res) for res in result]
