@@ -125,3 +125,27 @@ class Rakwrap:
             params=params
         ).data["result"]["item"]
         return [Product(**res) for res in result]
+    
+    def generate_deep_links(
+        self,
+        url: str,
+        advertiser_id: int,
+        u1: str = None
+    ):
+        """
+        Generates deep links with partner advertiser's product links
+        https://developers.rakutenadvertising.com/documentation/en-US/affiliate_apis#/Deep%20Link/post_v1_links_deep_links
+        """
+        endpoint = "/v1/links/deep_links"
+        body = {
+            "url": url,
+            "advertiser_id": advertiser_id,
+        }
+        if u1:
+            body["u1"] = u1
+        result = self.adapter.post(
+            endpoint=endpoint,
+            data=body,
+            json=True
+        ).data["advertiser"]
+        return result["deep_link"]

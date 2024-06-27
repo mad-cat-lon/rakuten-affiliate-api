@@ -4,7 +4,7 @@ import base64
 from rakwrap.models import Result
 import xmltojson
 from io import StringIO
-import json
+
 
 class RestAdapter:
     def __init__(self, host: str, client_id: str, client_secret: str, account_id: int):
@@ -23,7 +23,8 @@ class RestAdapter:
             endpoint: str,
             params: Dict = None,
             data: Dict = None,
-            is_auth: bool = False
+            is_auth: bool = False,
+            json: bool = False
     ) -> Result:
         url = f"{self.host}{endpoint}"
         if is_auth:
@@ -41,12 +42,20 @@ class RestAdapter:
             headers = {
                 'Authorization': f'Bearer {self.access_token}'
             }
-        response = requests.request(
-            method=http_method,
-            url=url, headers=headers,
-            params=params,
-            data=data
-        )
+        if json:
+            response = requests.request(
+                method=http_method,
+                url=url, headers=headers,
+                params=params,
+                json=data
+            )
+        else:
+            response = requests.request(
+                method=http_method,
+                url=url, headers=headers,
+                params=params,
+                data=data
+            )
         # Some APIs return XML whereas others return JSON
         # Quick check to see what we're dealing with here
         # TODO: Make this more robust or tag individual APIs with their datatype
@@ -60,13 +69,21 @@ class RestAdapter:
             return Result(response.status_code, message=response.reason, data=response_data)
         raise Exception(response_data)
   
-    def post(self, endpoint: str, params: Dict = None, data: Dict = None, is_auth: bool = False):
+    def post(
+        self,
+        endpoint: str,
+        params: Dict = None,
+        data: Dict = None,
+        is_auth: bool = False,
+        json: bool = False
+    ):
         return self._do(
             http_method="POST",
             endpoint=endpoint,
             params=params,
             data=data,
-            is_auth=is_auth
+            is_auth=is_auth,
+            json=json
         )
 
     def get(self, endpoint: str, params: Dict = None):
