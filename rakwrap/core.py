@@ -146,6 +146,6 @@ class Rakwrap:
         result = self.adapter.post(
             endpoint=endpoint,
             data=body,
-            json=True
+            is_json=True
         ).data["advertiser"]
         return result["deep_link"]
