@@ -1,2 +1,3 @@
-xmltodict==0.12.0
+vxmltodict==0.12.0
 xmltojson==2.0.2
+requests==2.32.3

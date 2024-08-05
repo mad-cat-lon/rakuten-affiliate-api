@@ -1,9 +1,10 @@
-from rakwrap.rest_adapter import RestAdapter
-from rakwrap.models import Event, Advertiser, Product
+from rakuten.rest_adapter import RestAdapter
+from rakuten.models import Event, Advertiser, Product
 import datetime
-from typing import List
+from typing import List, Literal
 
-class Rakwrap:
+    
+class Rakuten:
     def __init__(self, client_id: str, client_secret: str, account_id: int):
         self.base_url = "https://api.linksynergy.com"
         self.client_id = client_id
@@ -18,6 +19,70 @@ class Rakwrap:
 
     def auth(self):
         return self.adapter.get_token()
+    
+    def get_payments(
+        self,
+        report_type: Literal["all_history", "advertisers_history", "details"],
+        security_token: str,
+        network_id: int = None,
+        payment_id: int = None,
+        report_date_start: datetime.date = None,
+        report_date_end: datetime.date = None,
+        invoice_id: int = None,
+        advertiser_id: int = None
+    ):
+        endpoint = "/advancedreports/1.0"
+        if report_type == "all_history":
+            #  bdate and edate are mandatory
+            if not report_date_start or not report_date_end:
+                raise ValueError("Payment history summary requires start date and end date")
+            
+        params = {
+            "token": security_token
+        }
+        match report_type:
+            case "all_history":
+                params["reportid"] = 1
+            case "advertisers_history":
+                params["reportid"] = 2
+            case "details":
+                params["reportid"] = 3
+        if report_date_start:
+            params["bdate"] = report_date_start.strftime("%Y%m%d")
+        if report_date_end:
+            params["edate"] = report_date_end.strftime("%Y%m%d")
+        if payment_id:
+            params["payid"] = payment_id
+        if network_id:
+            params["nid"] = network_id
+        if invoice_id:
+            params["invoiceid"] = invoice_id
+        if advertiser_id:
+            params["mid"] = advertiser_id
+        result = self.adapter.get(endpoint=endpoint, params=params, return_type="csv")
+        return result
+
+    def get_coupons(
+        self,
+        category_ids: List[int] = None,
+        promotion_type_ids: List[int] = None,
+        network_id: int = None,
+        advertiser_id: int = None,
+        num_results: int = None,
+        page: int = None
+    ):
+        endpoint = "/coupon/1.0"
+        params = {}
+        if category_ids:
+            params["category"] = "|".join([str(i) for i in category_ids])
+        if promotion_type_ids:
+            params["promotiontype"] = "|".join([str(i) for i in promotion_type_ids])
+        if network_id:
+            params["network"] = network_id
+        if advertiser_id:
+            params["mid"] = advertiser_id
+        result = self.adapter.get(endpoint=endpoint, params=params, return_type="xml")
+        return result.data
     
     def get_events(
         self,
@@ -56,7 +121,8 @@ class Rakwrap:
         endpoint = "/advertisersearch/1.0"
         result = self.adapter.get(
             endpoint=endpoint,
-            params=params
+            params=params,
+            return_type="xml"
         ).data["result"]["midlist"]["merchant"]
         # Change "mid" to "id" and "merchantname" to "name"
         result = [{"id": res["mid"], "name": res["merchantname"]} for res in result]
@@ -122,7 +188,8 @@ class Rakwrap:
         }
         result = self.adapter.get(
             endpoint=endpoint,
-            params=params
+            params=params,
+            return_type="xml"
         ).data["result"]["item"]
         return [Product(**res) for res in result]
     
@@ -149,3 +216,4 @@ class Rakwrap:
             is_json=True
         ).data["advertiser"]
         return result["deep_link"]
+    

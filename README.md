@@ -1,15 +1,15 @@
-# rakwrap
+# rakuten-affiliate
 A simple Python wrapper for [Rakuten Advertising](https://developers.rakutenadvertising.com/documentation/en-CA/affiliate_apis)'s APIs.
 Work in progress, will become a pip package soon!
 
 # Quickstart
 ```
-from rakwrap.core import Rakwrap
+from rakuten import Rakuten
 CLIENT_ID = "CLIENT_ID"
 CLIENT_SECRET = "CLIENT_SECRET"
 ACCOUNT_ID = ACCOUNT_ID
 
-rak = Rakwrap(CLIENT_ID, CLIENT_SECRET, ACCOUNT_ID)
+rak = Rakuten(CLIENT_ID, CLIENT_SECRET, ACCOUNT_ID)
 rak.auth()
 
 # Fetching all transaction events in the past 30 days
@@ -29,3 +29,5 @@ for event in res:
 - `​/events​/1.0​/transactions`
 - `/productsearch/1.0`
 - `​/v2​/advertisers`
+- `/v1/links/deep_links`
+- `/advancedreports/1.0`
